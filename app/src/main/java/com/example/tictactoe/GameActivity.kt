@@ -1,9 +1,8 @@
 package com.example.tictactoe
 
+import android.animation.Animator
 import android.os.Bundle
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -11,6 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 
 class GameActivity : AppCompatActivity() {
+
+    companion object {
+        private const val ANIMATION_DURATION = 300L
+    }
 
     private val game = TicTacToeGame()
 
@@ -58,7 +61,7 @@ class GameActivity : AppCompatActivity() {
 
         item00Img.setOnClickListener { item00Img.makeMove(0, 0) }
         item01Img.setOnClickListener { item01Img.makeMove(0, 1) }
-        item02Img.setOnClickListener { item02Img.makeMove(0,2) }
+        item02Img.setOnClickListener { item02Img.makeMove(0, 2) }
         item10Img.setOnClickListener { item10Img.makeMove(1, 0) }
         item11Img.setOnClickListener { item11Img.makeMove(1, 1) }
         item12Img.setOnClickListener { item12Img.makeMove(1, 2) }
@@ -74,11 +77,12 @@ class GameActivity : AppCompatActivity() {
         val isCurrentPlayer1 = game.isPlayer1
         val winner = game.makeMove(row, column)
         if (isCurrentPlayer1 != game.isPlayer1) {
-            setImageResource(if (isCurrentPlayer1) R.drawable.ic_cross else R.drawable.ic_circle)
+            animateScaleInFadeIn(isCurrentPlayer1)
         }
-        val hasWinner = winner != Winner.NONE
-        dimmerView?.isVisible = hasWinner
-        resultTv?.isVisible = hasWinner
+        if (winner != Winner.NONE) {
+            dimmerView?.animateFadeIn()
+            resultTv?.animateFadeIn()
+        }
         when (winner) {
             Winner.PLAYER1 -> resultTv?.text = "Player 1 won"
             Winner.PLAYER2 -> resultTv?.text = "Player 2 won"
@@ -87,14 +91,90 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
+    private fun ImageView.animateScaleInFadeIn(isCurrentPlayer1: Boolean) {
+        alpha = 0f
+        scaleX = 0f
+        scaleY = 0f
+        setImageResource(if (isCurrentPlayer1) R.drawable.ic_cross else R.drawable.ic_circle)
+        animate()
+            .setDuration(ANIMATION_DURATION)
+            .alphaBy(0f)
+            .alpha(1f)
+            .scaleX(0f)
+            .scaleY(0f)
+            .scaleXBy(1f)
+            .scaleYBy(1f)
+            .setListener(object : Animator.AnimatorListener {
+                override fun onAnimationStart(p0: Animator) = Unit
+                override fun onAnimationEnd(p0: Animator) = Unit
+                override fun onAnimationCancel(p0: Animator) = Unit
+                override fun onAnimationRepeat(p0: Animator) = Unit
+            })
+            .start()
+    }
+
+    private fun ImageView.animateScaleOutFadeOut() {
+        animate()
+            .setDuration(ANIMATION_DURATION)
+            .alphaBy(1f)
+            .alpha(0f)
+            .scaleXBy(1f)
+            .scaleYBy(1f)
+            .scaleX(0f)
+            .scaleY(0f)
+            .setListener(object : Animator.AnimatorListener {
+                override fun onAnimationStart(p0: Animator) = Unit
+                override fun onAnimationEnd(p0: Animator) {
+                    setImageDrawable(null)
+                }
+                override fun onAnimationCancel(p0: Animator) = Unit
+                override fun onAnimationRepeat(p0: Animator) = Unit
+
+            })
+    }
+
+    private fun View.animateFadeIn() {
+        alpha = 0f
+        isVisible = true
+        animate()
+            .setDuration(ANIMATION_DURATION)
+            .alphaBy(0f)
+            .alpha(1f)
+            .setListener(object : Animator.AnimatorListener {
+                override fun onAnimationStart(p0: Animator) = Unit
+                override fun onAnimationEnd(p0: Animator) = Unit
+                override fun onAnimationCancel(p0: Animator) = Unit
+                override fun onAnimationRepeat(p0: Animator) = Unit
+            })
+            .start()
+    }
+
+    private fun View.animateFadeOut() {
+        animate()
+            .setDuration(ANIMATION_DURATION)
+            .alphaBy(1f)
+            .alpha(0f)
+            .setListener(object : Animator.AnimatorListener {
+                override fun onAnimationStart(p0: Animator) = Unit
+
+                override fun onAnimationEnd(p0: Animator) {
+                    isVisible = false
+                }
+
+                override fun onAnimationCancel(p0: Animator) = Unit
+                override fun onAnimationRepeat(p0: Animator) = Unit
+            })
+            .start()
+    }
+
     private fun playAgain() {
         for (itemImg in itemImgList!!) {
             if (itemImg.drawable != null) {
-                itemImg.setImageDrawable(null)
+                itemImg.animateScaleOutFadeOut()
             }
         }
         game.clear()
-        resultTv?.isVisible = false
-        dimmerView?.isVisible = false
+        resultTv?.animateFadeOut()
+        dimmerView?.animateFadeOut()
     }
 }
