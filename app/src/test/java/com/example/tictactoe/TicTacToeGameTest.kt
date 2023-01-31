@@ -57,10 +57,10 @@ class TicTacToeGameTest {
         assertEquals(Winner.NONE, game.makeMove(0, 2)) // 1
         assertEquals(Winner.NONE, game.makeMove(0, 1)) // 2
         assertEquals(Winner.DRAW, game.makeMove(2, 1)) // 1
-        assertEquals(true, game.isGameOver)
+        assertTrue(game.winner != Winner.NONE)
         assertEquals(false, game.isPlayer1)
         game.clear()
-        assertEquals(false, game.isGameOver)
+        assertTrue(game.winner != Winner.NONE)
         assertEquals(true, game.isPlayer1)
     }
 }

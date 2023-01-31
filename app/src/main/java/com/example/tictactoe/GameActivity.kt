@@ -15,7 +15,7 @@ class GameActivity : AppCompatActivity() {
         private const val ANIMATION_DURATION = 300L
     }
 
-    private val game = TicTacToeGame()
+    private var game: TicTacToeGame? = null
 
     private var dimmerView: View? = null
     private var resultTv: TextView? = null
@@ -71,14 +71,35 @@ class GameActivity : AppCompatActivity() {
 
         resultTv?.setOnClickListener { playAgain() }
         dimmerView?.setOnClickListener { playAgain() }
+
+        savedInstanceState?.let {
+            game = it.getParcelable("game")
+            val flatGameField = game!!.getField().flatten()
+            for (i in flatGameField.indices) {
+                val gameCell = flatGameField[i]
+                if (gameCell != 0) {
+                    itemImgList!![i].animateScaleInFadeIn(gameCell == 1)
+                }
+            }
+            checkWinner(game!!.winner)
+        } ?: run { game = TicTacToeGame() }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable("game", game)
     }
 
     private fun ImageView.makeMove(row: Int, column: Int) {
-        val isCurrentPlayer1 = game.isPlayer1
-        val winner = game.makeMove(row, column)
-        if (isCurrentPlayer1 != game.isPlayer1) {
+        val isCurrentPlayer1 = game!!.isPlayer1
+        val winner = game!!.makeMove(row, column)
+        if (isCurrentPlayer1 != game!!.isPlayer1) {
             animateScaleInFadeIn(isCurrentPlayer1)
         }
+        checkWinner(winner)
+    }
+
+    private fun checkWinner(winner: Winner) {
         if (winner != Winner.NONE) {
             dimmerView?.animateFadeIn()
             resultTv?.animateFadeIn()
@@ -87,7 +108,7 @@ class GameActivity : AppCompatActivity() {
             Winner.PLAYER1 -> resultTv?.text = "Player 1 won"
             Winner.PLAYER2 -> resultTv?.text = "Player 2 won"
             Winner.DRAW -> resultTv?.text = "Draw"
-            Winner.NONE -> {}
+            Winner.NONE -> Unit
         }
     }
 
@@ -173,7 +194,7 @@ class GameActivity : AppCompatActivity() {
                 itemImg.animateScaleOutFadeOut()
             }
         }
-        game.clear()
+        game!!.clear()
         resultTv?.animateFadeOut()
         dimmerView?.animateFadeOut()
     }
