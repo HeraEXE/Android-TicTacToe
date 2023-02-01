@@ -15,10 +15,10 @@ class GameActivity : AppCompatActivity() {
         private const val ANIMATION_DURATION = 300L
     }
 
-    private var game: TicTacToeGame? = null
+    private lateinit var game: TicTacToeGame
 
-    private var dimmerView: View? = null
-    private var resultTv: TextView? = null
+    private lateinit var dimmerView: View
+    private lateinit var resultTv: TextView
 
     private var itemImgList: List<ImageView>? = null
 
@@ -69,19 +69,19 @@ class GameActivity : AppCompatActivity() {
         item21Img.setOnClickListener { item21Img.makeMove(2, 1) }
         item22Img.setOnClickListener { item22Img.makeMove(2, 2) }
 
-        resultTv?.setOnClickListener { playAgain() }
-        dimmerView?.setOnClickListener { playAgain() }
+        resultTv.setOnClickListener { playAgain() }
+        dimmerView.setOnClickListener { playAgain() }
 
         savedInstanceState?.let {
-            game = it.getParcelable("game")
-            val flatGameField = game!!.getField().flatten()
+            game = it.getParcelable("game") ?: TicTacToeGame()
+            val flatGameField = game.getField().flatten()
             for (i in flatGameField.indices) {
                 val gameCell = flatGameField[i]
                 if (gameCell != 0) {
                     itemImgList!![i].animateScaleInFadeIn(gameCell == 1)
                 }
             }
-            checkWinner(game!!.winner)
+            checkWinner(game.winner)
         } ?: run { game = TicTacToeGame() }
     }
 
@@ -91,9 +91,9 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun ImageView.makeMove(row: Int, column: Int) {
-        val isCurrentPlayer1 = game!!.isPlayer1
-        val winner = game!!.makeMove(row, column)
-        if (isCurrentPlayer1 != game!!.isPlayer1) {
+        val isCurrentPlayer1 = game.isPlayer1
+        val winner = game.makeMove(row, column)
+        if (isCurrentPlayer1 != game.isPlayer1) {
             animateScaleInFadeIn(isCurrentPlayer1)
         }
         checkWinner(winner)
@@ -101,13 +101,13 @@ class GameActivity : AppCompatActivity() {
 
     private fun checkWinner(winner: Winner) {
         if (winner != Winner.NONE) {
-            dimmerView?.animateFadeIn()
-            resultTv?.animateFadeIn()
+            dimmerView.animateFadeIn()
+            resultTv.animateFadeIn()
         }
         when (winner) {
-            Winner.PLAYER1 -> resultTv?.text = "Player 1 won"
-            Winner.PLAYER2 -> resultTv?.text = "Player 2 won"
-            Winner.DRAW -> resultTv?.text = "Draw"
+            Winner.PLAYER1 -> resultTv.text = "Player 1 won"
+            Winner.PLAYER2 -> resultTv.text = "Player 2 won"
+            Winner.DRAW -> resultTv.text = "Draw"
             Winner.NONE -> Unit
         }
     }
@@ -194,8 +194,8 @@ class GameActivity : AppCompatActivity() {
                 itemImg.animateScaleOutFadeOut()
             }
         }
-        game!!.clear()
-        resultTv?.animateFadeOut()
-        dimmerView?.animateFadeOut()
+        game.clear()
+        resultTv.animateFadeOut()
+        dimmerView.animateFadeOut()
     }
 }
