@@ -1,4 +1,4 @@
-package com.example.tictactoe
+package net.herasevyan.tictactoe
 
 import org.junit.Before
 import org.junit.Test

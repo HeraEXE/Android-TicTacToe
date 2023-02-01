@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.tictactoe'
+    namespace 'net.herasevyan.tictactoe'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.tictactoe"
+        applicationId "net.herasevyan.tictactoe"
         minSdk 24
         targetSdk 33
         versionCode 1

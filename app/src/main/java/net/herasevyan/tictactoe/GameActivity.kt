@@ -1,4 +1,4 @@
-package com.example.tictactoe
+package net.herasevyan.tictactoe
 
 import android.animation.Animator
 import android.os.Bundle
