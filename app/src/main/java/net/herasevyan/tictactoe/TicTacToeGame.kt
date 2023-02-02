@@ -54,8 +54,7 @@ class TicTacToeGame() : Parcelable {
         gameField[row][column] = if (isPlayer1) 1 else 2
         isPlayer1 = !isPlayer1
 
-        fun checkWinner(): Boolean {
-            return (gameField[0][0] != 0 && gameField[0][0] == gameField[0][1] && gameField[0][1] == gameField[0][2])
+        val hasWinner = (gameField[0][0] != 0 && gameField[0][0] == gameField[0][1] && gameField[0][1] == gameField[0][2])
                     || (gameField[1][0] != 0 && gameField[1][0] == gameField[1][1] && gameField[1][1] == gameField[1][2])
                     || (gameField[2][0] != 0 && gameField[2][0] == gameField[2][1] && gameField[2][1] == gameField[2][2])
                     || (gameField[0][0] != 0 && gameField[0][0] == gameField[1][0] && gameField[1][0] == gameField[2][0])
@@ -63,9 +62,9 @@ class TicTacToeGame() : Parcelable {
                     || (gameField[0][2] != 0 && gameField[0][2] == gameField[1][2] && gameField[1][2] == gameField[2][2])
                     || (gameField[0][0] != 0 && gameField[0][0] == gameField[1][1] && gameField[1][1] == gameField[2][2])
                     || (gameField[2][0] != 0 && gameField[2][0] == gameField[1][1] && gameField[1][1] == gameField[0][2])
-        }
 
-        if (checkWinner()) {
+
+        if (hasWinner) {
             winner = if (!isPlayer1) PLAYER1 else PLAYER2
             return winner
         }
