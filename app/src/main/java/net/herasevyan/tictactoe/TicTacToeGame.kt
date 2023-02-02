@@ -46,7 +46,6 @@ class TicTacToeGame() : Parcelable {
     override fun describeContents() = 0
 
     fun makeMove(row: Int, column: Int): Winner {
-
         if (gameField[row][column] != 0) {
             winner = NONE
             return winner
@@ -62,7 +61,6 @@ class TicTacToeGame() : Parcelable {
                     || (gameField[0][2] != 0 && gameField[0][2] == gameField[1][2] && gameField[1][2] == gameField[2][2])
                     || (gameField[0][0] != 0 && gameField[0][0] == gameField[1][1] && gameField[1][1] == gameField[2][2])
                     || (gameField[2][0] != 0 && gameField[2][0] == gameField[1][1] && gameField[1][1] == gameField[0][2])
-
 
         if (hasWinner) {
             winner = if (!isPlayer1) PLAYER1 else PLAYER2
