@@ -15,6 +15,8 @@ class TicTacToeGame() : Parcelable {
     var winner: Winner = NONE
         private set
 
+    val flattenGameField get() = gameField.flatten()
+
     private val gameField = arrayOf(
         arrayOf(0, 0, 0),
         arrayOf(0, 0, 0),
@@ -85,8 +87,6 @@ class TicTacToeGame() : Parcelable {
             }
         }
     }
-
-    fun getFlattenGameField() = gameField.flatten()
 
     companion object CREATOR : Parcelable.Creator<TicTacToeGame> {
         override fun createFromParcel(parcel: Parcel): TicTacToeGame {
