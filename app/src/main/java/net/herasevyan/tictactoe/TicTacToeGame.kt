@@ -44,12 +44,25 @@ class TicTacToeGame() : Parcelable {
     override fun describeContents() = 0
 
     fun makeMove(row: Int, column: Int): Winner {
+
         if (gameField[row][column] != 0) {
             winner = NONE
             return winner
         }
         gameField[row][column] = if (isPlayer1) 1 else 2
         isPlayer1 = !isPlayer1
+
+        fun checkWinner(): Boolean {
+            return (gameField[0][0] != 0 && gameField[0][0] == gameField[0][1] && gameField[0][1] == gameField[0][2])
+                    || (gameField[1][0] != 0 && gameField[1][0] == gameField[1][1] && gameField[1][1] == gameField[1][2])
+                    || (gameField[2][0] != 0 && gameField[2][0] == gameField[2][1] && gameField[2][1] == gameField[2][2])
+                    || (gameField[0][0] != 0 && gameField[0][0] == gameField[1][0] && gameField[1][0] == gameField[2][0])
+                    || (gameField[0][1] != 0 && gameField[0][1] == gameField[1][1] && gameField[1][1] == gameField[2][1])
+                    || (gameField[0][2] != 0 && gameField[0][2] == gameField[1][2] && gameField[1][2] == gameField[2][2])
+                    || (gameField[0][0] != 0 && gameField[0][0] == gameField[1][1] && gameField[1][1] == gameField[2][2])
+                    || (gameField[2][0] != 0 && gameField[2][0] == gameField[1][1] && gameField[1][1] == gameField[0][2])
+        }
+
         if (checkWinner()) {
             winner = if (!isPlayer1) PLAYER1 else PLAYER2
             return winner
@@ -73,18 +86,7 @@ class TicTacToeGame() : Parcelable {
         }
     }
 
-    fun getField() = gameField.copyOf()
-
-    private fun checkWinner(): Boolean {
-        return (gameField[0][0] != 0 && gameField[0][0] == gameField[0][1] && gameField[0][1] == gameField[0][2])
-                || (gameField[1][0] != 0 && gameField[1][0] == gameField[1][1] && gameField[1][1] == gameField[1][2])
-                || (gameField[2][0] != 0 && gameField[2][0] == gameField[2][1] && gameField[2][1] == gameField[2][2])
-                || (gameField[0][0] != 0 && gameField[0][0] == gameField[1][0] && gameField[1][0] == gameField[2][0])
-                || (gameField[0][1] != 0 && gameField[0][1] == gameField[1][1] && gameField[1][1] == gameField[2][1])
-                || (gameField[0][2] != 0 && gameField[0][2] == gameField[1][2] && gameField[1][2] == gameField[2][2])
-                || (gameField[0][0] != 0 && gameField[0][0] == gameField[1][1] && gameField[1][1] == gameField[2][2])
-                || (gameField[2][0] != 0 && gameField[2][0] == gameField[1][1] && gameField[1][1] == gameField[0][2])
-    }
+    fun getFlattenGameField() = gameField.flatten()
 
     companion object CREATOR : Parcelable.Creator<TicTacToeGame> {
         override fun createFromParcel(parcel: Parcel): TicTacToeGame {

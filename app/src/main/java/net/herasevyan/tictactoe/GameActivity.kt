@@ -20,7 +20,7 @@ class GameActivity : AppCompatActivity() {
     private lateinit var dimmerView: View
     private lateinit var resultTv: TextView
 
-    private var itemImgList: List<ImageView>? = null
+    private lateinit var itemImgList: List<ImageView>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,11 +53,66 @@ class GameActivity : AppCompatActivity() {
             row2Layout.layoutParams = row2Params
         }, 100)
 
-        itemImgList = listOf(
-            item00Img, item01Img, item02Img,
-            item10Img, item11Img, item12Img,
-            item20Img, item21Img, item22Img
-        )
+        fun ImageView.animateScaleInFadeIn(isCurrentPlayer1: Boolean) {
+            alpha = 0f
+            scaleX = 0f
+            scaleY = 0f
+            setImageResource(if (isCurrentPlayer1) R.drawable.ic_cross else R.drawable.ic_circle)
+            animate()
+                .setDuration(ANIMATION_DURATION)
+                .alphaBy(0f)
+                .alpha(1f)
+                .scaleX(0f)
+                .scaleY(0f)
+                .scaleXBy(1f)
+                .scaleYBy(1f)
+                .setListener(object : Animator.AnimatorListener {
+                    override fun onAnimationStart(p0: Animator) = Unit
+                    override fun onAnimationEnd(p0: Animator) = Unit
+                    override fun onAnimationCancel(p0: Animator) = Unit
+                    override fun onAnimationRepeat(p0: Animator) = Unit
+                })
+                .start()
+        }
+
+        fun checkWinner(winner: Winner) {
+
+            fun View.animateFadeIn() {
+                alpha = 0f
+                isVisible = true
+                animate()
+                    .setDuration(ANIMATION_DURATION)
+                    .alphaBy(0f)
+                    .alpha(1f)
+                    .setListener(object : Animator.AnimatorListener {
+                        override fun onAnimationStart(p0: Animator) = Unit
+                        override fun onAnimationEnd(p0: Animator) = Unit
+                        override fun onAnimationCancel(p0: Animator) = Unit
+                        override fun onAnimationRepeat(p0: Animator) = Unit
+                    })
+                    .start()
+            }
+
+            if (winner != Winner.NONE) {
+                dimmerView.animateFadeIn()
+                resultTv.animateFadeIn()
+            }
+            when (winner) {
+                Winner.PLAYER1 -> resultTv.text = "Player 1 won"
+                Winner.PLAYER2 -> resultTv.text = "Player 2 won"
+                Winner.DRAW -> resultTv.text = "Draw"
+                Winner.NONE -> Unit
+            }
+        }
+
+        fun ImageView.makeMove(row: Int, column: Int) {
+            val isCurrentPlayer1 = game.isPlayer1
+            val winner = game.makeMove(row, column)
+            if (isCurrentPlayer1 != game.isPlayer1) {
+                animateScaleInFadeIn(isCurrentPlayer1)
+            }
+            checkWinner(winner)
+        }
 
         item00Img.setOnClickListener { item00Img.makeMove(0, 0) }
         item01Img.setOnClickListener { item01Img.makeMove(0, 1) }
@@ -69,16 +124,72 @@ class GameActivity : AppCompatActivity() {
         item21Img.setOnClickListener { item21Img.makeMove(2, 1) }
         item22Img.setOnClickListener { item22Img.makeMove(2, 2) }
 
+        itemImgList = listOf(
+            item00Img, item01Img, item02Img,
+            item10Img, item11Img, item12Img,
+            item20Img, item21Img, item22Img
+        )
+
+        fun playAgain() {
+
+            fun View.animateFadeOut() {
+                animate()
+                    .setDuration(ANIMATION_DURATION)
+                    .alphaBy(1f)
+                    .alpha(0f)
+                    .setListener(object : Animator.AnimatorListener {
+                        override fun onAnimationStart(p0: Animator) = Unit
+
+                        override fun onAnimationEnd(p0: Animator) {
+                            isVisible = false
+                        }
+
+                        override fun onAnimationCancel(p0: Animator) = Unit
+                        override fun onAnimationRepeat(p0: Animator) = Unit
+                    })
+                    .start()
+            }
+
+            fun ImageView.animateScaleOutFadeOut() {
+                animate()
+                    .setDuration(ANIMATION_DURATION)
+                    .alphaBy(1f)
+                    .alpha(0f)
+                    .scaleXBy(1f)
+                    .scaleYBy(1f)
+                    .scaleX(0f)
+                    .scaleY(0f)
+                    .setListener(object : Animator.AnimatorListener {
+                        override fun onAnimationStart(p0: Animator) = Unit
+                        override fun onAnimationEnd(p0: Animator) {
+                            setImageDrawable(null)
+                        }
+                        override fun onAnimationCancel(p0: Animator) = Unit
+                        override fun onAnimationRepeat(p0: Animator) = Unit
+
+                    })
+            }
+
+            for (itemImg in itemImgList) {
+                if (itemImg.drawable != null) {
+                    itemImg.animateScaleOutFadeOut()
+                }
+            }
+            game.clear()
+            resultTv.animateFadeOut()
+            dimmerView.animateFadeOut()
+        }
+
         resultTv.setOnClickListener { playAgain() }
         dimmerView.setOnClickListener { playAgain() }
 
         savedInstanceState?.let {
             game = it.getParcelable("game") ?: TicTacToeGame()
-            val flatGameField = game.getField().flatten()
+            val flatGameField = game.getFlattenGameField()
             for (i in flatGameField.indices) {
                 val gameCell = flatGameField[i]
                 if (gameCell != 0) {
-                    itemImgList!![i].animateScaleInFadeIn(gameCell == 1)
+                    itemImgList[i].animateScaleInFadeIn(gameCell == 1)
                 }
             }
             checkWinner(game.winner)
@@ -88,114 +199,5 @@ class GameActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putParcelable("game", game)
-    }
-
-    private fun ImageView.makeMove(row: Int, column: Int) {
-        val isCurrentPlayer1 = game.isPlayer1
-        val winner = game.makeMove(row, column)
-        if (isCurrentPlayer1 != game.isPlayer1) {
-            animateScaleInFadeIn(isCurrentPlayer1)
-        }
-        checkWinner(winner)
-    }
-
-    private fun checkWinner(winner: Winner) {
-        if (winner != Winner.NONE) {
-            dimmerView.animateFadeIn()
-            resultTv.animateFadeIn()
-        }
-        when (winner) {
-            Winner.PLAYER1 -> resultTv.text = "Player 1 won"
-            Winner.PLAYER2 -> resultTv.text = "Player 2 won"
-            Winner.DRAW -> resultTv.text = "Draw"
-            Winner.NONE -> Unit
-        }
-    }
-
-    private fun ImageView.animateScaleInFadeIn(isCurrentPlayer1: Boolean) {
-        alpha = 0f
-        scaleX = 0f
-        scaleY = 0f
-        setImageResource(if (isCurrentPlayer1) R.drawable.ic_cross else R.drawable.ic_circle)
-        animate()
-            .setDuration(ANIMATION_DURATION)
-            .alphaBy(0f)
-            .alpha(1f)
-            .scaleX(0f)
-            .scaleY(0f)
-            .scaleXBy(1f)
-            .scaleYBy(1f)
-            .setListener(object : Animator.AnimatorListener {
-                override fun onAnimationStart(p0: Animator) = Unit
-                override fun onAnimationEnd(p0: Animator) = Unit
-                override fun onAnimationCancel(p0: Animator) = Unit
-                override fun onAnimationRepeat(p0: Animator) = Unit
-            })
-            .start()
-    }
-
-    private fun ImageView.animateScaleOutFadeOut() {
-        animate()
-            .setDuration(ANIMATION_DURATION)
-            .alphaBy(1f)
-            .alpha(0f)
-            .scaleXBy(1f)
-            .scaleYBy(1f)
-            .scaleX(0f)
-            .scaleY(0f)
-            .setListener(object : Animator.AnimatorListener {
-                override fun onAnimationStart(p0: Animator) = Unit
-                override fun onAnimationEnd(p0: Animator) {
-                    setImageDrawable(null)
-                }
-                override fun onAnimationCancel(p0: Animator) = Unit
-                override fun onAnimationRepeat(p0: Animator) = Unit
-
-            })
-    }
-
-    private fun View.animateFadeIn() {
-        alpha = 0f
-        isVisible = true
-        animate()
-            .setDuration(ANIMATION_DURATION)
-            .alphaBy(0f)
-            .alpha(1f)
-            .setListener(object : Animator.AnimatorListener {
-                override fun onAnimationStart(p0: Animator) = Unit
-                override fun onAnimationEnd(p0: Animator) = Unit
-                override fun onAnimationCancel(p0: Animator) = Unit
-                override fun onAnimationRepeat(p0: Animator) = Unit
-            })
-            .start()
-    }
-
-    private fun View.animateFadeOut() {
-        animate()
-            .setDuration(ANIMATION_DURATION)
-            .alphaBy(1f)
-            .alpha(0f)
-            .setListener(object : Animator.AnimatorListener {
-                override fun onAnimationStart(p0: Animator) = Unit
-
-                override fun onAnimationEnd(p0: Animator) {
-                    isVisible = false
-                }
-
-                override fun onAnimationCancel(p0: Animator) = Unit
-                override fun onAnimationRepeat(p0: Animator) = Unit
-            })
-            .start()
-    }
-
-    private fun playAgain() {
-        for (itemImg in itemImgList!!) {
-            if (itemImg.drawable != null) {
-                itemImg.animateScaleOutFadeOut()
-            }
-        }
-        game.clear()
-        resultTv.animateFadeOut()
-        dimmerView.animateFadeOut()
     }
 }
