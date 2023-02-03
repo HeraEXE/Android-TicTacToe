@@ -15,12 +15,12 @@ class TicTacToeGame() : Parcelable {
     var winner: Winner = NONE
         private set
 
-    val flattenGameField get() = gameField.flatten()
+    val flattenGameField get() = gameField.flatMap { it.asList() }
 
     private val gameField = arrayOf(
-        arrayOf(0, 0, 0),
-        arrayOf(0, 0, 0),
-        arrayOf(0, 0, 0)
+        intArrayOf(0, 0, 0),
+        intArrayOf(0, 0, 0),
+        intArrayOf(0, 0, 0)
     )
 
     constructor(parcel: Parcel) : this() {
