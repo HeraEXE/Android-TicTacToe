@@ -21,7 +21,7 @@ class TicTacToeGameTest {
         assertEquals(Winner.NONE, game.makeMove(1, 0))
         assertEquals(Winner.NONE, game.makeMove(0,1))
         assertEquals(Winner.NONE, game.makeMove(1, 1))
-        assertEquals(Winner.PLAYER1, game.makeMove(0, 2))
+        assertEquals(Winner.X, game.makeMove(0, 2))
         game.clear()
         assertEquals(Winner.NONE, game.makeMove(0, 0))
     }
@@ -33,7 +33,7 @@ class TicTacToeGameTest {
         assertEquals(Winner.NONE, game.makeMove(0,1))
         assertEquals(Winner.NONE, game.makeMove(1, 1))
         assertEquals(Winner.NONE, game.makeMove(2, 2))
-        assertEquals(Winner.PLAYER2, game.makeMove(1, 2))
+        assertEquals(Winner.O, game.makeMove(1, 2))
     }
 
     @Test
@@ -45,7 +45,7 @@ class TicTacToeGameTest {
         assertEquals(Winner.NONE, game.makeMove(0, 1)) // 1
         assertEquals(Winner.NONE, game.makeMove(1, 0)) // 1
         assertEquals(Winner.NONE, game.makeMove(2, 2)) // 2
-        assertEquals(Winner.PLAYER1, game.makeMove(2, 0)) // 1
+        assertEquals(Winner.X, game.makeMove(2, 0)) // 1
     }
 
     @Test
@@ -60,9 +60,9 @@ class TicTacToeGameTest {
         assertEquals(Winner.NONE, game.makeMove(0, 1)) // 2
         assertEquals(Winner.DRAW, game.makeMove(2, 1)) // 1
         assertTrue(game.winner != Winner.NONE)
-        assertEquals(false, game.isPlayer1)
+        assertEquals(false, game.isXTurn)
         game.clear()
         assertTrue(game.winner != Winner.NONE)
-        assertEquals(true, game.isPlayer1)
+        assertEquals(true, game.isXTurn)
     }
 }

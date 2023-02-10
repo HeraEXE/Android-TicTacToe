@@ -3,13 +3,13 @@ package net.herasevyan.tictactoe.ui.game
 import android.os.Parcel
 import android.os.Parcelable
 import net.herasevyan.tictactoe.ui.game.Winner.NONE
-import net.herasevyan.tictactoe.ui.game.Winner.PLAYER1
-import net.herasevyan.tictactoe.ui.game.Winner.PLAYER2
+import net.herasevyan.tictactoe.ui.game.Winner.X
+import net.herasevyan.tictactoe.ui.game.Winner.O
 import net.herasevyan.tictactoe.ui.game.Winner.DRAW
 
 class TicTacToeGame() : Parcelable {
 
-    var isPlayer1 = true
+    var isXTurn = true
         private set
 
     var winner: Winner = NONE
@@ -24,7 +24,7 @@ class TicTacToeGame() : Parcelable {
     )
 
     constructor(parcel: Parcel) : this() {
-        isPlayer1 = parcel.readInt() == 0
+        isXTurn = parcel.readInt() == 0
         winner = Winner.values()[parcel.readInt()]
         for (i in gameField.indices) {
             for (j in gameField[i].indices) {
@@ -34,7 +34,7 @@ class TicTacToeGame() : Parcelable {
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeInt(if (isPlayer1) 0 else 1)
+        dest.writeInt(if (isXTurn) 0 else 1)
         dest.writeInt(winner.ordinal)
         for (i in gameField.indices) {
             for (j in gameField[i].indices) {
@@ -50,8 +50,8 @@ class TicTacToeGame() : Parcelable {
             winner = NONE
             return winner
         }
-        gameField[row][column] = if (isPlayer1) 1 else 2
-        isPlayer1 = !isPlayer1
+        gameField[row][column] = if (isXTurn) 1 else 2
+        isXTurn = !isXTurn
 
         val hasWinner = (gameField[0][0] != 0 && gameField[0][0] == gameField[0][1] && gameField[0][1] == gameField[0][2])
                     || (gameField[1][0] != 0 && gameField[1][0] == gameField[1][1] && gameField[1][1] == gameField[1][2])
@@ -63,7 +63,7 @@ class TicTacToeGame() : Parcelable {
                     || (gameField[2][0] != 0 && gameField[2][0] == gameField[1][1] && gameField[1][1] == gameField[0][2])
 
         if (hasWinner) {
-            winner = if (!isPlayer1) PLAYER1 else PLAYER2
+            winner = if (!isXTurn) X else O
             return winner
         }
         for (gameRow in gameField) {
@@ -77,7 +77,7 @@ class TicTacToeGame() : Parcelable {
     }
 
     fun clear() {
-        isPlayer1 = true
+        isXTurn = true
         for (row in gameField) {
             for (i in row.indices) {
                 row[i] = 0

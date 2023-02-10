@@ -56,20 +56,19 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             )
 
             viewLifecycleOwner.lifecycleScope.launch {
+
+                viewModel.intent.send(GameIntent.Restore)
+
                 viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.state.collect { state ->
                         when (state) {
                             is GameState.Inactive -> Unit
                             is GameState.ClearField -> clear()
                             is GameState.UpdateMove -> updateMove(state)
-                            is GameState.Start -> start(state)
+                            is GameState.Restore -> restore(state)
                         }
                     }
                 }
-            }
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.intent.send(GameIntent.Start)
             }
         }
     }
@@ -104,7 +103,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         }
     }
 
-    private fun start(state: GameState.Start) {
+    private fun restore(state: GameState.Restore) {
         val flattenGameField = state.flattenGameField
         for (i in flattenGameField.indices) {
             val gameCell = flattenGameField[i]
@@ -126,8 +125,8 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             resultTv.animateFadeIn()
         }
         when (winner) {
-            Winner.PLAYER1 -> resultTv.text = "Player 1 won"
-            Winner.PLAYER2 -> resultTv.text = "Player 2 won"
+            Winner.X -> resultTv.text = "Player 1 won"
+            Winner.O -> resultTv.text = "Player 2 won"
             Winner.DRAW -> resultTv.text = "Draw"
             Winner.NONE -> Unit
         }

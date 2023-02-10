@@ -33,7 +33,7 @@ class GameViewModel(private val savedStateHandle: SavedStateHandle) : BaseViewMo
         viewModelScope.launch {
             intent.consumeAsFlow().collect {
                 when (it) {
-                    is GameIntent.Start -> start()
+                    is GameIntent.Restore -> restore()
                     is GameIntent.PlayAgain -> clear()
                     is GameIntent.MakeMove -> makeMove(it)
                 }
@@ -41,17 +41,17 @@ class GameViewModel(private val savedStateHandle: SavedStateHandle) : BaseViewMo
         }
     }
 
-    private fun start() {
-        mutableState.value = GameState.Start(game.winner, game.flattenGameField)
+    private fun restore() {
+        mutableState.value = GameState.Restore(game.winner, game.flattenGameField)
     }
 
     private fun makeMove(intent: GameIntent.MakeMove) {
-        val isPrevPlayer1 = game.isPlayer1
+        val isPrevPlayer1 = game.isXTurn
         val winner = game.makeMove(intent.row, intent.column)
         mutableState.value = GameState.UpdateMove(
             intent.imageView,
             winner,
-            if (isPrevPlayer1 != game.isPlayer1) isPrevPlayer1 else null
+            if (isPrevPlayer1 != game.isXTurn) isPrevPlayer1 else null
         )
 
     }
