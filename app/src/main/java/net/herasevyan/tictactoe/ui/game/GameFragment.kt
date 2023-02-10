@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -14,8 +13,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.herasevyan.tictactoe.R
 import net.herasevyan.tictactoe.databinding.FragmentGameBinding
+import net.herasevyan.tictactoe.ui.base.IntentFragment
 
-class GameFragment : Fragment(R.layout.fragment_game) {
+class GameFragment : IntentFragment(R.layout.fragment_game) {
 
     companion object {
         private const val ANIMATION_DURATION = 300L
@@ -56,26 +56,28 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             )
 
             viewLifecycleOwner.lifecycleScope.launch {
-
                 viewModel.intent.send(GameIntent.Restore)
-
-                viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.state.collect { state ->
-                        when (state) {
-                            is GameState.Inactive -> Unit
-                            is GameState.ClearField -> clear()
-                            is GameState.UpdateMove -> updateMove(state)
-                            is GameState.Restore -> restore(state)
-                        }
-                    }
-                }
+                updateState()
             }
         }
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         bindingNullable = null
+        super.onDestroyView()
+    }
+
+    override suspend fun updateState() {
+        viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.state.collect { state ->
+                when (state) {
+                    is GameState.Inactive -> Unit
+                    is GameState.ClearField -> binding.clear()
+                    is GameState.UpdateMove -> updateMove(state)
+                    is GameState.Restore -> restore(state)
+                }
+            }
+        }
     }
 
     private suspend fun FragmentGameBinding.adjustField() {
@@ -115,7 +117,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
     }
 
     private fun updateMove(state: GameState.UpdateMove) {
-        state.isPrevPlayer1?.let { state.imageView.animateScaleInFadeIn(it) }
+        state.wasXTurn?.let { state.imageView.animateScaleInFadeIn(it) }
         binding.checkWinner(state.winner)
     }
 
@@ -125,8 +127,8 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             resultTv.animateFadeIn()
         }
         when (winner) {
-            Winner.X -> resultTv.text = "Player 1 won"
-            Winner.O -> resultTv.text = "Player 2 won"
+            Winner.X -> resultTv.text = "Player X won"
+            Winner.O -> resultTv.text = "Player O won"
             Winner.DRAW -> resultTv.text = "Draw"
             Winner.NONE -> Unit
         }
@@ -142,11 +144,11 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         dimmerView.animateFadeOut()
     }
 
-    private fun ImageView.animateScaleInFadeIn(isCurrentPlayer1: Boolean) {
+    private fun ImageView.animateScaleInFadeIn(wasXTurn: Boolean) {
         alpha = 0f
         scaleX = 0f
         scaleY = 0f
-        setImageResource(if (isCurrentPlayer1) R.drawable.ic_cross else R.drawable.ic_circle)
+        setImageResource(if (wasXTurn) R.drawable.ic_cross else R.drawable.ic_circle)
         animate()
             .setDuration(ANIMATION_DURATION)
             .alphaBy(0f)

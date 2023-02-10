@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
-import net.herasevyan.tictactoe.ui.base.BaseViewModel
+import net.herasevyan.tictactoe.ui.base.IntentViewModel
 
-class GameViewModel(private val savedStateHandle: SavedStateHandle) : BaseViewModel() {
+class GameViewModel(private val savedStateHandle: SavedStateHandle) : IntentViewModel() {
 
     companion object {
         private const val GAME = "game"
@@ -23,8 +23,8 @@ class GameViewModel(private val savedStateHandle: SavedStateHandle) : BaseViewMo
 
     private var game: TicTacToeGame
     get() = savedStateHandle[GAME] ?: TicTacToeGame().also {
-            savedStateHandle[GAME] = it
-        }
+        savedStateHandle[GAME] = it
+    }
     set(value) { savedStateHandle[GAME] = value }
 
     init { handleIntent() }
@@ -46,12 +46,12 @@ class GameViewModel(private val savedStateHandle: SavedStateHandle) : BaseViewMo
     }
 
     private fun makeMove(intent: GameIntent.MakeMove) {
-        val isPrevPlayer1 = game.isXTurn
+        val wasXTurn = game.isXTurn
         val winner = game.makeMove(intent.row, intent.column)
         mutableState.value = GameState.UpdateMove(
             intent.imageView,
             winner,
-            if (isPrevPlayer1 != game.isXTurn) isPrevPlayer1 else null
+            if (wasXTurn != game.isXTurn) wasXTurn else null
         )
 
     }

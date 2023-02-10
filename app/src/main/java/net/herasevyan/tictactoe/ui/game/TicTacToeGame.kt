@@ -2,10 +2,7 @@ package net.herasevyan.tictactoe.ui.game
 
 import android.os.Parcel
 import android.os.Parcelable
-import net.herasevyan.tictactoe.ui.game.Winner.NONE
-import net.herasevyan.tictactoe.ui.game.Winner.X
-import net.herasevyan.tictactoe.ui.game.Winner.O
-import net.herasevyan.tictactoe.ui.game.Winner.DRAW
+import net.herasevyan.tictactoe.ui.game.Winner.*
 
 class TicTacToeGame() : Parcelable {
 

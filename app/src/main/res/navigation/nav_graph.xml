@@ -8,10 +8,17 @@
     <fragment
         android:id="@+id/menuFragment"
         android:name="net.herasevyan.tictactoe.ui.menu.MenuFragment"
-        tools:layout="@layout/fragment_menu" >
+        tools:layout="@layout/fragment_menu">
         <action
             android:id="@+id/from_menu_to_game"
             app:destination="@id/gameFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/from_menu_to_game_history"
+            app:destination="@id/gameHistoryFragment"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
@@ -21,4 +28,8 @@
         android:id="@+id/gameFragment"
         android:name="net.herasevyan.tictactoe.ui.game.GameFragment"
         tools:layout="@layout/fragment_game" />
+    <fragment
+        android:id="@+id/gameHistoryFragment"
+        android:name="net.herasevyan.tictactoe.ui.game_history.GameHistoryFragment"
+        tools:layout="@layout/fragment_game_history" />
 </navigation>

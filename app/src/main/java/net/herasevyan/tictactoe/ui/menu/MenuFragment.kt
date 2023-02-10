@@ -19,10 +19,14 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
         binding.startBtn.setOnClickListener {
             findNavController().navigate(R.id.from_menu_to_game)
         }
+
+        binding.historyBtn.setOnClickListener {
+            findNavController().navigate(R.id.from_menu_to_game_history)
+        }
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         bindingNullable = null
+        super.onDestroyView()
     }
 }

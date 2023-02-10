@@ -6,5 +6,5 @@ sealed class GameState {
     object Inactive : GameState()
     object ClearField : GameState()
     class Restore(val winner: Winner, val flattenGameField: List<Int>) : GameState()
-    class UpdateMove(val imageView: ImageView, val winner: Winner, val isPrevPlayer1: Boolean?) : GameState()
+    class UpdateMove(val imageView: ImageView, val winner: Winner, val wasXTurn: Boolean?) : GameState()
 }
