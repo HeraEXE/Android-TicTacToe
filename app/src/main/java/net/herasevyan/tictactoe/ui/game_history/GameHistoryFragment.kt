@@ -3,22 +3,23 @@ package net.herasevyan.tictactoe.ui.game_history
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.herasevyan.tictactoe.R
-import net.herasevyan.tictactoe.data.GameHistoryDao
 import net.herasevyan.tictactoe.databinding.FragmentGameHistoryBinding
-import javax.inject.Inject
+import net.herasevyan.tictactoe.ui.base.IntentFragment
 
 @AndroidEntryPoint
-class GameHistoryFragment : Fragment(R.layout.fragment_game_history) {
+class GameHistoryFragment : IntentFragment(R.layout.fragment_game_history) {
 
-    @Inject lateinit var gameHistoryDao: GameHistoryDao
+    private val viewModel: GameHistoryViewModel by viewModels()
 
     private var bindingNullable: FragmentGameHistoryBinding? = null
     private val binding: FragmentGameHistoryBinding get() = bindingNullable!!
@@ -33,13 +34,13 @@ class GameHistoryFragment : Fragment(R.layout.fragment_game_history) {
         super.onCreate(savedInstanceState)
         setFragmentResultListener("deleteKey") { _, _ ->
             viewLifecycleOwner.lifecycleScope.launch {
-                gameHistoryDao.deleteHistory()
+                viewModel.intent.send(GameHistoryIntent.DeleteHistory)
             }
         }
 
         setFragmentResultListener("deleteFieldKey") { _, bundle ->
             viewLifecycleOwner.lifecycleScope.launch {
-                gameHistoryDao.deleteGameField(bundle.getParcelable("gameField")!!)
+                viewModel.intent.send(GameHistoryIntent.DeleteGameField(bundle.getParcelable("gameField")!!))
             }
         }
     }
@@ -60,14 +61,24 @@ class GameHistoryFragment : Fragment(R.layout.fragment_game_history) {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            gameHistoryDao.loadHistory().collect { gameFields ->
-                adapter.submitList(gameFields)
-            }
+            viewModel.intent.send(GameHistoryIntent.LoadHistory)
+            updateState()
         }
     }
 
     override fun onDestroyView() {
         bindingNullable = null
         super.onDestroyView()
+    }
+
+    override suspend fun updateState() {
+        viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.state.collect { state ->
+                when (state) {
+                    GameHistoryState.Inactive -> Unit
+                    is GameHistoryState.LoadHistory -> adapter.submitList(state.history)
+                }
+            }
+        }
     }
 }

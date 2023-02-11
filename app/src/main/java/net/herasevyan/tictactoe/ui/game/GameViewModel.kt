@@ -41,8 +41,8 @@ class GameViewModel @Inject constructor(
         viewModelScope.launch {
             intent.consumeAsFlow().collect {
                 when (it) {
-                    is GameIntent.Restore -> restore()
-                    is GameIntent.PlayAgain -> clear()
+                    GameIntent.Restore -> restore()
+                    GameIntent.PlayAgain -> clear()
                     is GameIntent.MakeMove -> makeMove(it)
                 }
             }

@@ -37,7 +37,7 @@ class GameFragment : IntentFragment(R.layout.fragment_game) {
 
         with(binding) {
 
-            lifecycleScope.launch { adjustField() }
+            viewLifecycleOwner.lifecycleScope.launch { adjustField() }
 
             backImg.setOnClickListener { findNavController().navigateUp() }
 
@@ -76,8 +76,8 @@ class GameFragment : IntentFragment(R.layout.fragment_game) {
         viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.state.collect { state ->
                 when (state) {
-                    is GameState.Inactive -> Unit
-                    is GameState.ClearField -> binding.clear()
+                    GameState.Inactive -> Unit
+                    GameState.ClearField -> binding.clear()
                     is GameState.UpdateMove -> updateMove(state)
                     is GameState.Restore -> restore(state)
                 }
