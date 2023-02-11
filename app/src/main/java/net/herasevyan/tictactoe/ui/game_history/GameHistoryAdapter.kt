@@ -65,24 +65,6 @@ class GameHistoryAdapter : RecyclerView.Adapter<GameHistoryAdapter.ViewHolder>()
             val row0Params = row0Layout.layoutParams
             val row1Params = row1Layout.layoutParams
             val row2Params = row2Layout.layoutParams
-            val row1ViewParams= row1View.layoutParams
-            val row2ViewParams = row2View.layoutParams
-
-            val width = row0Layout.width / 3
-
-            row0Params.width = width
-            row1Params.width = width
-            row2Params.width = width
-            row1ViewParams.width = width
-            row2ViewParams.width = width
-
-            row0Layout.layoutParams = row0Params
-            row1Layout.layoutParams = row1Params
-            row2Layout.layoutParams = row2Params
-            row1View.layoutParams = row1ViewParams
-            row2View.layoutParams = row2ViewParams
-
-            delay(100)
 
             row0Params.height = item00Img.width
             row1Params.height = item00Img.width

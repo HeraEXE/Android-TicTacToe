@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:background="@color/white"
     android:orientation="vertical"
+    android:gravity="center"
     android:padding="10dp">
 
     <LinearLayout
@@ -43,7 +44,6 @@
     </LinearLayout>
 
     <View
-        android:id="@+id/row1_view"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/black" />
@@ -85,7 +85,6 @@
     </LinearLayout>
 
     <View
-        android:id="@+id/row2_view"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/black" />

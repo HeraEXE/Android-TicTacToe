@@ -20,7 +20,7 @@ class GameHistoryFragment : Fragment(R.layout.fragment_game_history) {
         super.onViewCreated(view, savedInstanceState)
         bindingNullable = FragmentGameHistoryBinding.bind(view)
 
-        binding.historyRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+        binding.historyRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
         binding.historyRecyclerView.adapter = adapter
 
         adapter.updateItems((activity?.application as App).history)
