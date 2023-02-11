@@ -9,12 +9,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.herasevyan.tictactoe.R
 import net.herasevyan.tictactoe.databinding.FragmentGameBinding
 import net.herasevyan.tictactoe.ui.base.IntentFragment
 
+@AndroidEntryPoint
 class GameFragment : IntentFragment(R.layout.fragment_game) {
 
     companion object {

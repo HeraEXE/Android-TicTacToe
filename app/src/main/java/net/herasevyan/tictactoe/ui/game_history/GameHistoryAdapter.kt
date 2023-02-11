@@ -12,10 +12,10 @@ import net.herasevyan.tictactoe.util.viewScope
 
 class GameHistoryAdapter : RecyclerView.Adapter<GameHistoryAdapter.ViewHolder>() {
 
-    private val items = mutableListOf<String>()
+    private val items = mutableListOf<List<Int>>()
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updateItems(items: List<String>) {
+    fun updateItems(items: List<List<Int>>) {
         this.items.clear()
         this.items.addAll(items)
         notifyDataSetChanged()
@@ -49,8 +49,7 @@ class GameHistoryAdapter : RecyclerView.Adapter<GameHistoryAdapter.ViewHolder>()
             }
         }
 
-        fun bind(flattenFieldStr: String) {
-            val flattenGameField = flattenFieldStr.split(',').map { it.toInt() }
+        fun bind(flattenGameField: List<Int>) {
             for (i in flattenGameField.indices) {
                 when (flattenGameField[i]) {
                     1 -> itemImgList[i].setImageResource(R.drawable.ic_cross)

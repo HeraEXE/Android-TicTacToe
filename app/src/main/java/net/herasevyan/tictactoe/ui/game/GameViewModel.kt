@@ -2,14 +2,22 @@ package net.herasevyan.tictactoe.ui.game
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
+import net.herasevyan.tictactoe.data.GameField
+import net.herasevyan.tictactoe.data.GameHistoryDao
 import net.herasevyan.tictactoe.ui.base.IntentViewModel
+import javax.inject.Inject
 
-class GameViewModel(private val savedStateHandle: SavedStateHandle) : IntentViewModel() {
+@HiltViewModel
+class GameViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
+    private val gameHistoryDao: GameHistoryDao
+    ) : IntentViewModel() {
 
     companion object {
         private const val GAME = "game"
@@ -48,6 +56,11 @@ class GameViewModel(private val savedStateHandle: SavedStateHandle) : IntentView
     private fun makeMove(intent: GameIntent.MakeMove) {
         val wasXTurn = game.isXTurn
         val winner = game.makeMove(intent.row, intent.column)
+        if (winner != Winner.NONE) {
+            viewModelScope.launch {
+                gameHistoryDao.addGameField(GameField(game.flattenGameField.joinToString(",")))
+            }
+        }
         mutableState.value = GameState.UpdateMove(
             intent.imageView,
             winner,
