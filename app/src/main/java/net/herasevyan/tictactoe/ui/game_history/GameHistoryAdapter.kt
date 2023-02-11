@@ -1,39 +1,41 @@
 package net.herasevyan.tictactoe.ui.game_history
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.herasevyan.tictactoe.R
+import net.herasevyan.tictactoe.data.GameField
 import net.herasevyan.tictactoe.databinding.ItemGameHistoryBinding
 import net.herasevyan.tictactoe.util.viewScope
 
-class GameHistoryAdapter : RecyclerView.Adapter<GameHistoryAdapter.ViewHolder>() {
-
-    private val items = mutableListOf<List<Int>>()
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateItems(items: List<List<Int>>) {
-        this.items.clear()
-        this.items.addAll(items)
-        notifyDataSetChanged()
-    }
+class GameHistoryAdapter(
+    private val onItemClick: (GameField) -> Unit
+) : ListAdapter<GameField, GameHistoryAdapter.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemGameHistoryBinding.inflate(inflater, parent, false)
-        return ViewHolder(binding)
+        return ViewHolder(binding, onItemClick)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(currentList[position])
     }
 
-    override fun getItemCount() = items.size
+    class DiffCallback : DiffUtil.ItemCallback<GameField>() {
+        override fun areItemsTheSame(oldItem: GameField, newItem: GameField) = oldItem.id == newItem.id
 
-    class ViewHolder(private val binding: ItemGameHistoryBinding) : RecyclerView.ViewHolder(binding.root) {
+        override fun areContentsTheSame(oldItem: GameField, newItem: GameField) = oldItem == newItem
+    }
+
+    class ViewHolder(
+        private val binding: ItemGameHistoryBinding,
+        private val onItemClick: (GameField) -> Unit
+        ) : RecyclerView.ViewHolder(binding.root) {
 
         private val itemImgList = binding.run {
             listOf(
@@ -49,13 +51,15 @@ class GameHistoryAdapter : RecyclerView.Adapter<GameHistoryAdapter.ViewHolder>()
             }
         }
 
-        fun bind(flattenGameField: List<Int>) {
+        fun bind(gameField: GameField) {
+            val flattenGameField = gameField.field.split(',').map { c -> c.toInt() }
             for (i in flattenGameField.indices) {
                 when (flattenGameField[i]) {
                     1 -> itemImgList[i].setImageResource(R.drawable.ic_cross)
                     2 -> itemImgList[i].setImageResource(R.drawable.ic_circle)
                 }
             }
+            binding.root.setOnClickListener { onItemClick(gameField) }
         }
 
         private suspend fun ItemGameHistoryBinding.adjustField() {

@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -37,6 +38,8 @@ class GameFragment : IntentFragment(R.layout.fragment_game) {
         with(binding) {
 
             lifecycleScope.launch { adjustField() }
+
+            backImg.setOnClickListener { findNavController().navigateUp() }
 
             item00Img.setOnClickListener { makeMove(GameIntent.MakeMove(0, 0, item00Img)) }
             item01Img.setOnClickListener { makeMove(GameIntent.MakeMove(0, 1, item01Img)) }
