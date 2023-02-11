@@ -35,8 +35,6 @@ class GameViewModel @Inject constructor(
     }
     set(value) { savedStateHandle[GAME] = value }
 
-    init { handleIntent() }
-
     override fun handleIntent() {
         viewModelScope.launch {
             intent.consumeAsFlow().collect {

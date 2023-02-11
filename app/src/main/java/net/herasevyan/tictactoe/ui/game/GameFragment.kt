@@ -6,9 +6,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -18,13 +16,13 @@ import net.herasevyan.tictactoe.databinding.FragmentGameBinding
 import net.herasevyan.tictactoe.ui.base.IntentFragment
 
 @AndroidEntryPoint
-class GameFragment : IntentFragment(R.layout.fragment_game) {
+class GameFragment : IntentFragment<GameViewModel>(R.layout.fragment_game) {
 
     companion object {
         private const val ANIMATION_DURATION = 300L
     }
 
-    private val viewModel: GameViewModel by viewModels()
+    override val viewModel: GameViewModel by viewModels()
 
     private var bindingNullable: FragmentGameBinding? = null
     private val binding: FragmentGameBinding get() = bindingNullable!!
@@ -62,7 +60,6 @@ class GameFragment : IntentFragment(R.layout.fragment_game) {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.intent.send(GameIntent.Restore)
-                updateState()
             }
         }
     }
@@ -73,14 +70,12 @@ class GameFragment : IntentFragment(R.layout.fragment_game) {
     }
 
     override suspend fun updateState() {
-        viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.state.collect { state ->
-                when (state) {
-                    GameState.Inactive -> Unit
-                    GameState.ClearField -> binding.clear()
-                    is GameState.UpdateMove -> updateMove(state)
-                    is GameState.Restore -> restore(state)
-                }
+        viewModel.state.collect { state ->
+            when (state) {
+                GameState.Inactive -> Unit
+                GameState.ClearField -> binding.clear()
+                is GameState.UpdateMove -> updateMove(state)
+                is GameState.Restore -> restore(state)
             }
         }
     }

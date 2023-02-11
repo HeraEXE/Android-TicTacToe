@@ -23,10 +23,6 @@ class GameHistoryViewModel @Inject constructor(
 
     private val mutableState = MutableStateFlow<GameHistoryState>(GameHistoryState.Inactive)
 
-    init {
-        handleIntent()
-    }
-
     override fun handleIntent() {
         viewModelScope.launch {
             intent.consumeAsFlow().collect {

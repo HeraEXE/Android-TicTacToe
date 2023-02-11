@@ -4,5 +4,7 @@ import androidx.lifecycle.ViewModel
 
 abstract class IntentViewModel : ViewModel() {
 
+    init { handleIntent() }
+
     protected abstract fun handleIntent()
 }

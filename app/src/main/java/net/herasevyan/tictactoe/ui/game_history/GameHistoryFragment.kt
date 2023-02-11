@@ -17,9 +17,9 @@ import net.herasevyan.tictactoe.databinding.FragmentGameHistoryBinding
 import net.herasevyan.tictactoe.ui.base.IntentFragment
 
 @AndroidEntryPoint
-class GameHistoryFragment : IntentFragment(R.layout.fragment_game_history) {
+class GameHistoryFragment : IntentFragment<GameHistoryViewModel>(R.layout.fragment_game_history) {
 
-    private val viewModel: GameHistoryViewModel by viewModels()
+    override val viewModel: GameHistoryViewModel by viewModels()
 
     private var bindingNullable: FragmentGameHistoryBinding? = null
     private val binding: FragmentGameHistoryBinding get() = bindingNullable!!
@@ -62,7 +62,6 @@ class GameHistoryFragment : IntentFragment(R.layout.fragment_game_history) {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.intent.send(GameHistoryIntent.LoadHistory)
-            updateState()
         }
     }
 
@@ -72,12 +71,10 @@ class GameHistoryFragment : IntentFragment(R.layout.fragment_game_history) {
     }
 
     override suspend fun updateState() {
-        viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.state.collect { state ->
-                when (state) {
-                    GameHistoryState.Inactive -> Unit
-                    is GameHistoryState.LoadHistory -> adapter.submitList(state.history)
-                }
+        viewModel.state.collect { state ->
+            when (state) {
+                GameHistoryState.Inactive -> Unit
+                is GameHistoryState.LoadHistory -> adapter.submitList(state.history)
             }
         }
     }
