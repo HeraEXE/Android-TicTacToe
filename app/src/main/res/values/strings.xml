@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">TicTacToe</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="btn_start">Start</string>
+    <string name="btn_history">History</string>
+    <string name="dialog_message_delete_item_from_history">Delete from history?</string>
+    <string name="dialog_message_delete_history">Delete history?</string>
+    <string name="message_winner_x">Player "\u2715" wins</string>
+    <string name="message_winner_o">Player "\u25EF" wins</string>
+    <string name="message_draw">Draw</string>
 </resources>

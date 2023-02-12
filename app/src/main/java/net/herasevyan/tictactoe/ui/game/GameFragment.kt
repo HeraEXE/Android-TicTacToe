@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -24,14 +25,12 @@ class GameFragment : IntentFragment<GameViewModel>(R.layout.fragment_game) {
 
     override val viewModel: GameViewModel by viewModels()
 
-    private var bindingNullable: FragmentGameBinding? = null
-    private val binding: FragmentGameBinding get() = bindingNullable!!
+    private val binding: FragmentGameBinding by viewBinding(FragmentGameBinding::bind)
 
     private lateinit var itemImgList: List<ImageView>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        bindingNullable = FragmentGameBinding.bind(view)
 
         with(binding) {
 
@@ -62,11 +61,6 @@ class GameFragment : IntentFragment<GameViewModel>(R.layout.fragment_game) {
                 viewModel.intent.send(GameIntent.Restore)
             }
         }
-    }
-
-    override fun onDestroyView() {
-        bindingNullable = null
-        super.onDestroyView()
     }
 
     override suspend fun updateState() {
@@ -127,9 +121,9 @@ class GameFragment : IntentFragment<GameViewModel>(R.layout.fragment_game) {
             resultTv.animateFadeIn()
         }
         when (winner) {
-            Winner.X -> resultTv.text = "Player X won"
-            Winner.O -> resultTv.text = "Player O won"
-            Winner.DRAW -> resultTv.text = "Draw"
+            Winner.X -> resultTv.setText(R.string.message_winner_x)
+            Winner.O -> resultTv.setText(R.string.message_winner_o)
+            Winner.DRAW -> resultTv.setText(R.string.message_draw)
             Winner.NONE -> Unit
         }
     }

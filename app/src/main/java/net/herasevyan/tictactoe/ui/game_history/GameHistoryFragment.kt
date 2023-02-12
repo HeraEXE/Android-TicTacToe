@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.herasevyan.tictactoe.R
@@ -21,8 +22,7 @@ class GameHistoryFragment : IntentFragment<GameHistoryViewModel>(R.layout.fragme
 
     override val viewModel: GameHistoryViewModel by viewModels()
 
-    private var bindingNullable: FragmentGameHistoryBinding? = null
-    private val binding: FragmentGameHistoryBinding get() = bindingNullable!!
+    private val binding: FragmentGameHistoryBinding by viewBinding(FragmentGameHistoryBinding::bind)
 
     private val adapter = GameHistoryAdapter { gameField ->
         DeleteGameFieldDialogFragment().apply {
@@ -47,7 +47,6 @@ class GameHistoryFragment : IntentFragment<GameHistoryViewModel>(R.layout.fragme
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        bindingNullable = FragmentGameHistoryBinding.bind(view)
 
         with(binding) {
             backImg.setOnClickListener { findNavController().navigateUp() }
@@ -63,11 +62,6 @@ class GameHistoryFragment : IntentFragment<GameHistoryViewModel>(R.layout.fragme
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.intent.send(GameHistoryIntent.LoadHistory)
         }
-    }
-
-    override fun onDestroyView() {
-        bindingNullable = null
-        super.onDestroyView()
     }
 
     override suspend fun updateState() {

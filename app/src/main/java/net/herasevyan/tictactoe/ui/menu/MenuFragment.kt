@@ -4,17 +4,16 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import by.kirich1409.viewbindingdelegate.viewBinding
 import net.herasevyan.tictactoe.R
 import net.herasevyan.tictactoe.databinding.FragmentMenuBinding
 
 class MenuFragment : Fragment(R.layout.fragment_menu) {
 
-    private var bindingNullable: FragmentMenuBinding? = null
-    private val binding: FragmentMenuBinding get() = bindingNullable!!
+    private val binding: FragmentMenuBinding by viewBinding(FragmentMenuBinding::bind)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        bindingNullable = FragmentMenuBinding.bind(view)
 
         binding.startBtn.setOnClickListener {
             findNavController().navigate(R.id.from_menu_to_game)
@@ -23,10 +22,5 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
         binding.historyBtn.setOnClickListener {
             findNavController().navigate(R.id.from_menu_to_game_history)
         }
-    }
-
-    override fun onDestroyView() {
-        bindingNullable = null
-        super.onDestroyView()
     }
 }
