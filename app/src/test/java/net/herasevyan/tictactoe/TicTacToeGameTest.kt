@@ -1,7 +1,7 @@
 package net.herasevyan.tictactoe
 
-import net.herasevyan.tictactoe.ui.game.TicTacToeGame
-import net.herasevyan.tictactoe.ui.game.Winner
+import net.herasevyan.tictactoe.game_logic.TicTacToeGame
+import net.herasevyan.tictactoe.game_logic.Winner
 import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.*

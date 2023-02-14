@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import net.herasevyan.tictactoe.data.GameField
 import net.herasevyan.tictactoe.data.GameHistoryDao
+import net.herasevyan.tictactoe.game_logic.TicTacToeGame
+import net.herasevyan.tictactoe.game_logic.Winner
 import net.herasevyan.tictactoe.ui.base.IntentViewModel
 import javax.inject.Inject
 
@@ -48,22 +50,18 @@ class GameViewModel @Inject constructor(
     }
 
     private fun restore() {
-        mutableState.value = GameState.Restore(game.winner, game.flattenGameField)
+        mutableState.value = GameState.Restore(game.getCurrentGame())
     }
 
     private fun makeMove(intent: GameIntent.MakeMove) {
-        val wasXTurn = game.isXTurn
-        val winner = game.makeMove(intent.row, intent.column)
-        if (winner != Winner.NONE) {
+        val moveResult = game.makeMove(intent.row, intent.column) ?: return
+        if (moveResult.winner != Winner.NONE) {
             viewModelScope.launch {
-                gameHistoryDao.addGameField(GameField(game.flattenGameField.joinToString(",")))
+                val currentGame = game.getCurrentGame()
+                gameHistoryDao.addGameField(GameField(currentGame.flattenField))
             }
         }
-        mutableState.value = GameState.UpdateMove(
-            intent.imageView,
-            winner,
-            if (wasXTurn != game.isXTurn) wasXTurn else null
-        )
+        mutableState.value = GameState.UpdateMove(intent.imageView, moveResult)
 
     }
 

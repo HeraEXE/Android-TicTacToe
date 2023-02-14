@@ -14,6 +14,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.herasevyan.tictactoe.R
 import net.herasevyan.tictactoe.databinding.FragmentGameBinding
+import net.herasevyan.tictactoe.game_logic.Turn
+import net.herasevyan.tictactoe.game_logic.Winner
 import net.herasevyan.tictactoe.ui.base.IntentFragment
 
 @AndroidEntryPoint
@@ -100,19 +102,19 @@ class GameFragment : IntentFragment<GameViewModel>(R.layout.fragment_game) {
     }
 
     private fun restore(state: GameState.Restore) {
-        val flattenGameField = state.flattenGameField
+        val flattenGameField = state.currentGame.flattenField
         for (i in flattenGameField.indices) {
             val gameCell = flattenGameField[i]
             if (gameCell != 0) {
-                itemImgList[i].animateScaleInFadeIn(gameCell == 1)
+                itemImgList[i].animateScaleInFadeIn(if (gameCell == 1) Turn.X else Turn.O)
             }
         }
-        binding.checkWinner(state.winner)
+        binding.checkWinner(state.currentGame.winner)
     }
 
     private fun updateMove(state: GameState.UpdateMove) {
-        state.wasXTurn?.let { state.imageView.animateScaleInFadeIn(it) }
-        binding.checkWinner(state.winner)
+        state.imageView.animateScaleInFadeIn(state.moveResult.turn)
+        binding.checkWinner(state.moveResult.winner)
     }
 
     private fun FragmentGameBinding.checkWinner(winner: Winner) {
@@ -138,11 +140,14 @@ class GameFragment : IntentFragment<GameViewModel>(R.layout.fragment_game) {
         dimmerView.animateFadeOut()
     }
 
-    private fun ImageView.animateScaleInFadeIn(wasXTurn: Boolean) {
+    private fun ImageView.animateScaleInFadeIn(turn: Turn) {
         alpha = 0f
         scaleX = 0f
         scaleY = 0f
-        setImageResource(if (wasXTurn) R.drawable.ic_cross else R.drawable.ic_circle)
+        setImageResource(when (turn) {
+            Turn.X -> R.drawable.ic_cross
+            Turn.O -> R.drawable.ic_circle
+        })
         animate()
             .setDuration(ANIMATION_DURATION)
             .alphaBy(0f)

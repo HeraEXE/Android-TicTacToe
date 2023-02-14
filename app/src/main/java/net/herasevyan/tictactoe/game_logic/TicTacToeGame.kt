@@ -1,18 +1,13 @@
-package net.herasevyan.tictactoe.ui.game
+package net.herasevyan.tictactoe.game_logic
 
 import android.os.Parcel
 import android.os.Parcelable
-import net.herasevyan.tictactoe.ui.game.Winner.*
 
 class TicTacToeGame() : Parcelable {
 
-    var isXTurn = true
-        private set
+    private var winner: Winner = Winner.NONE
 
-    var winner: Winner = NONE
-        private set
-
-    val flattenGameField get() = gameField.flatMap { it.asList() }
+    private var turn = Turn.O
 
     private val gameField = arrayOf(
         intArrayOf(0, 0, 0),
@@ -21,8 +16,8 @@ class TicTacToeGame() : Parcelable {
     )
 
     constructor(parcel: Parcel) : this() {
-        isXTurn = parcel.readInt() == 0
-        winner = Winner.values()[parcel.readInt()]
+        winner = Winner.values().find { it.i == parcel.readInt() } ?: Winner.NONE
+        turn = Turn.values().find { it.i == parcel.readInt() } ?: Turn.O
         for (i in gameField.indices) {
             for (j in gameField[i].indices) {
                 gameField[i][j] = parcel.readInt()
@@ -31,8 +26,8 @@ class TicTacToeGame() : Parcelable {
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeInt(if (isXTurn) 0 else 1)
-        dest.writeInt(winner.ordinal)
+        dest.writeInt(winner.i)
+        dest.writeInt(turn.i)
         for (i in gameField.indices) {
             for (j in gameField[i].indices) {
                 dest.writeInt(gameField[i][j])
@@ -42,13 +37,15 @@ class TicTacToeGame() : Parcelable {
 
     override fun describeContents() = 0
 
-    fun makeMove(row: Int, column: Int): Winner {
+    fun makeMove(row: Int, column: Int): MoveResult? {
         if (gameField[row][column] != 0) {
-            winner = NONE
-            return winner
+            return null
         }
-        gameField[row][column] = if (isXTurn) 1 else 2
-        isXTurn = !isXTurn
+        turn = when (turn) {
+            Turn.O -> Turn.X
+            Turn.X -> Turn.O
+        }
+        gameField[row][column] = turn.i
 
         val hasWinner = (gameField[0][0] != 0 && gameField[0][0] == gameField[0][1] && gameField[0][1] == gameField[0][2])
                     || (gameField[1][0] != 0 && gameField[1][0] == gameField[1][1] && gameField[1][1] == gameField[1][2])
@@ -60,27 +57,35 @@ class TicTacToeGame() : Parcelable {
                     || (gameField[2][0] != 0 && gameField[2][0] == gameField[1][1] && gameField[1][1] == gameField[0][2])
 
         if (hasWinner) {
-            winner = if (!isXTurn) X else O
-            return winner
+            winner = when (turn) {
+                Turn.X -> Winner.X
+                Turn.O -> Winner.O
+            }
+            return MoveResult(winner, turn)
         }
         for (gameRow in gameField) {
             if (gameRow.any { it == 0 }) {
-                winner = NONE
-                return winner
+                winner = Winner.NONE
+                return MoveResult(winner, turn)
             }
         }
-        winner = DRAW
-        return winner
+        winner = Winner.DRAW
+        return MoveResult(winner, turn)
     }
 
     fun clear() {
-        isXTurn = true
         for (row in gameField) {
             for (i in row.indices) {
                 row[i] = 0
             }
         }
     }
+
+    fun getCurrentGame() = CurrentGame(
+        gameField.flatMap { it.asList() },
+        winner,
+        turn
+    )
 
     companion object CREATOR : Parcelable.Creator<TicTacToeGame> {
         override fun createFromParcel(parcel: Parcel): TicTacToeGame {

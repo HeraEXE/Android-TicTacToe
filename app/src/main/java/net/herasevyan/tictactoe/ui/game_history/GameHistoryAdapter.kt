@@ -52,9 +52,8 @@ class GameHistoryAdapter(
         }
 
         fun bind(gameField: GameField) {
-            val flattenGameField = gameField.field.split(',').map { c -> c.toInt() }
-            for (i in flattenGameField.indices) {
-                when (flattenGameField[i]) {
+            for (i in gameField.flattenField.indices) {
+                when (gameField.flattenField[i]) {
                     1 -> itemImgList[i].setImageResource(R.drawable.ic_cross)
                     2 -> itemImgList[i].setImageResource(R.drawable.ic_circle)
                 }
